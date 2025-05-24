@@ -55,7 +55,7 @@ class MeetmeList(_Request):
         """
         `conference` is the optional identifier of the bridge.
         """
-        _Request.__init__(self, 'MeetmeList')
+        super().__init__('MeetmeList')
         if not conference is None:
             self['Conference'] = conference
             
@@ -71,7 +71,7 @@ class MeetmeListRooms(_Request):
     _synchronous_events_finalising = (app_meetme_events.MeetmeListRoomsComplete,)
     
     def __init__(self):
-        _Request.__init__(self, 'MeetmeListRooms')
+        super().__init__('MeetmeListRooms')
         
 class MeetmeMute(_Request):
     """
@@ -85,7 +85,7 @@ class MeetmeMute(_Request):
         be muted, which is associated with a channel by the 'MeetmeJoin' event. If successful, this
         request will trigger a 'MeetmeMute' event.
         """
-        _Request.__init__(self, 'MeetmeMute')
+        super().__init__('MeetmeMute')
         self['Meetme'] = meetme
         self['Usernum'] = usernum
 
@@ -101,7 +101,7 @@ class MeetmeUnmute(_Request):
         be unmuted, which is associated with a channel by the 'MeetmeJoin' event. If successful,
         this request will trigger a 'MeetmeMute' event.
         """
-        _Request.__init__(self, 'MeetmeUnmute')
+        super().__init__('MeetmeUnmute')
         self['Meetme'] = meetme
         self['Usernum'] = usernum
         

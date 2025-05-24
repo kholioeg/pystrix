@@ -6,7 +6,7 @@
 Overview
 ========
 
-pystrix runs on python 2.7/python 3.4+ on any platform. It's targeted at Asterisk 1.10+ and provides a rich, easy-to-extend set of bindings for AGI, FastAGI, and AMI.
+pystrix runs on Python 3.7+ (officially supporting Python 3.13) on any platform. It's targeted at Asterisk 1.10+ and provides a rich, easy-to-extend set of bindings for AGI, FastAGI, and AMI.
 
 ================
 Release Schedule

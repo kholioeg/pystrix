@@ -40,13 +40,9 @@ import socket
 import threading
 import time
 import traceback
-import types
 import warnings
 
-try:
-    import queue
-except:
-    import Queue as queue
+import queue
 
 _EVENT_REGISTRY = {} #Meant to be internally managed only, this provides mappings from event-class-names to the classes, to enable type-mutation
 _EVENT_REGISTRY_REV = {} #Provides the friendly names of events as strings, keyed by class object
@@ -83,10 +79,7 @@ def _format_socket_error(exception):
     """
     try:
         (errno, message) = exception
-        return "[%(errno)i] %(error)s" % {
-         'errno': errno,
-         'error': message,
-        }
+        return f"[{errno}] {message}"
     except Exception:
         return str(exception)
         
@@ -197,10 +190,7 @@ class Manager(object):
                         for (i, aggregate) in enumerate(self._event_aggregates):
                             if aggregate[0] <= current_time: #Expired
                                 del self._event_aggregates[i]
-                                (self._logger and self._logger.warn or warnings.warn)("Aggregate '%(name)s' for action-ID '%(action-id)s' timed out before all events were gathered" % {
-                                 'name': aggregate[1].name,
-                                 'action-id': aggregate[1].action_id,
-                                })
+                                (self._logger and self._logger.warn or warnings.warn)(f"Aggregate '{aggregate[1].name}' for action-ID '{aggregate[1].action_id}' timed out before all events were gathered")
                 else:
                     event_aggregate_cycle -= 1
                     
@@ -245,21 +235,13 @@ class Manager(object):
                 callbacks = [c for (t, e, c) in self._event_callbacks if (t == _CALLBACK_TYPE_REFERENCE and event_name == e) or (t == _CALLBACK_TYPE_UNIVERSAL)]
                 
             if self._logger:
-                self._logger.debug("Received event '%(name)s' with %(callbacks)i callbacks" % {
-                 'name': event_name,
-                 'callbacks': len(callbacks),
-                })
+                self._logger.debug(f"Received event '{event_name}' with {len(callbacks)} callbacks")
                 
             for callback in callbacks:
                 try:
                     callback(event, self)
                 except Exception as e:
-                    (self._logger and self._logger.error or warnings.warn)("Exception occurred while processing event callback: event='%(event)r'; handler='%(function)s' exception: %(error)s; trace:\n%(trace)s" % {
-                     'event': event,
-                     'function': str(callback),
-                     'error': str(e),
-                     'trace': traceback.format_exc(),
-                    })
+                    (self._logger and self._logger.error or warnings.warn)(f"Exception occurred while processing event callback: event='{event!r}'; handler='{str(callback)}' exception: {str(e)}; trace:\n{traceback.format_exc()}")
                     
             return True
         return False
@@ -282,21 +264,13 @@ class Manager(object):
                 callbacks = [c for (t, e, c) in self._event_callbacks if t == _CALLBACK_TYPE_ORPHANED]
                 
             if self._logger:
-                self._logger.debug("Received orphaned response '%(name)s' with %(callbacks)i callbacks" % {
-                 'name': response.name,
-                 'callbacks': len(callbacks),
-                })
+                self._logger.debug(f"Received orphaned response '{response.name}' with {len(callbacks)} callbacks")
                 
             for callback in callbacks:
                 try:
                     callback(response, self)
                 except Exception as e:
-                    (self._logger and self._logger.error or warnings.warn)("Exception occurred while processing orphaned response handler: response=%(response)r; handler='%(function)s'; exception: %(error)s; trace:\n%(trace)s" % {
-                     'response': response,
-                     'function': str(callback),
-                     'error': str(e),
-                     'trace': traceback.format_exc(),
-                    })
+                    (self._logger and self._logger.error or warnings.warn)(f"Exception occurred while processing orphaned response handler: response={response!r}; handler='{str(callback)}'; exception: {str(e)}; trace:\n{traceback.format_exc()}")
                     
             return True
         return False
@@ -316,11 +290,7 @@ class Manager(object):
         Generates a host-qualified, random-token-augmented ActionID as a string, for greater
         identifiability.
         """
-        return '%(hostname)s-%(random)s-%(id)08x' % {
-         'hostname': self._hostname,
-         'random': self._action_id_random_token,
-         'id': self._get_action_id(),
-        }
+        return f'{self._hostname}-{self._action_id_random_token}-{self._get_action_id():08x}'
 
     def close(self):
         """
@@ -523,10 +493,7 @@ class Manager(object):
                 for aggregate_class in request.get_aggregate_classes():
                     self._event_aggregates.append((time.time() + self._event_aggregates_timeout, aggregate_class(action_id)))
                     if self._debug:
-                        (self._logger and self._logger.debug or warnings.warn)("Started building aggregate-event '%(event)s' for action-ID '%(action-id)s'" % {
-                         'event': _EVENT_REGISTRY_REV.get(aggregate_class),
-                         'action-id': action_id,
-                        })
+                        (self._logger and self._logger.debug or warnings.warn)(f"Started building aggregate-event '{_EVENT_REGISTRY_REV.get(aggregate_class)}' for action-ID '{action_id}'")
 
         start_time = time.time()
         timeout = start_time + request.timeout
@@ -548,9 +515,7 @@ class Manager(object):
         else: #Timed out
             if request.synchronous:
                 events_timeout = True
-                (self._logger and self._logger.warn or warnings.warn)("Timed out while collecting events for synchronised action-ID '%(action-id)s'" % {
-                 'action-id': action_id,
-                })
+                (self._logger and self._logger.warn or warnings.warn)(f"Timed out while collecting events for synchronised action-ID '{action_id}'")
                 
         self._serve_outstanding_request(action_id) #Get the ActionID out of circulation
         if response:
@@ -565,9 +530,7 @@ class Manager(object):
                 events_timeout
             )
         else:
-            (self._logger and self._logger.warn or warnings.warn)("Timed out while waiting for response for action-ID '%(action-id)s'" % {
-             'action-id': action_id,
-            })
+            (self._logger and self._logger.warn or warnings.warn)(f"Timed out while waiting for response for action-ID '{action_id}'")
             return None
 
     def _add_outstanding_request(self, action_id, request):
@@ -743,10 +706,7 @@ class _Aggregate(_MessageTemplate, dict):
             items_count = sum(len(v) for (k, v) in self.items() if type(v) is list and isinstance(k, str))
             self._valid = list_items_count == items_count
             if not self._valid:
-                self._error_message = "Expected %(event)i list-items; received %(count)i" % {
-                 'event': list_items_count,
-                 'count': items_count,
-                }
+                self._error_message = f"Expected {list_items_count} list-items; received {items_count}"
                 
     def evaluate_event(self, event):
         """
@@ -904,7 +864,7 @@ class _Request(dict):
         items = [(KEY_ACTION, self[KEY_ACTION])]
         for (key, value) in [(k, v) for (k, v) in self.items() if not k in (KEY_ACTION, KEY_ACTIONID)] + kwargs.items():
             key = str(key)
-            if type(value) in (tuple, list, set, frozenset):
+            if isinstance(value, (tuple, list, set, frozenset)):
                 for val in value:
                     items.append((key, str(val)))
             else:
@@ -918,10 +878,7 @@ class _Request(dict):
             items.append((KEY_ACTIONID, action_id))
             
         return (
-         _EOL.join(['%(key)s: %(value)s' % {
-          'key': key,
-          'value': value,
-         } for (key, value) in items] + [_EOL]),
+         _EOL.join([f'{key}: {value}' for (key, value) in items] + [_EOL]),
          action_id,
         )
 
@@ -958,7 +915,7 @@ class _MessageReader(threading.Thread):
     _served_requests_lock = None #A means of preventing race conditions from affecting the served-request set
 
     def __init__(self, manager, orphaned_response_timeout):
-        threading.Thread.__init__(self)
+        super().__init__()
         self.daemon = True
         self.name = 'pystrix-ami-message-reader'
         
@@ -1133,9 +1090,7 @@ class _SynchronisedSocket(object):
                     return None
                 except socket.error as e:
                     self._close()
-                    raise ManagerSocketError("Connection to Asterisk manager broken while reading data: %(error)s" % {
-                     'error': _format_socket_error(e),
-                    })
+                    raise ManagerSocketError(f"Connection to Asterisk manager broken while reading data: {_format_socket_error(e)}")
                 except AttributeError:
                     raise ManagerSocketError("Local socket no longer defined, caused by system shutdown and blocking I/O")
 
@@ -1167,9 +1122,7 @@ class _SynchronisedSocket(object):
                 self._socket.sendall(message)
             except socket.error as e:
                 self._close()
-                raise ManagerSocketError("Connection to Asterisk manager broken while writing data: %(error)s" % {
-                 'error': _format_socket_error(e),
-                })
+                raise ManagerSocketError(f"Connection to Asterisk manager broken while writing data: {_format_socket_error(e)}")
                 
     def _connect(self, host, port):
         """
@@ -1184,9 +1137,7 @@ class _SynchronisedSocket(object):
             self._socket_file = self._socket.makefile()
         except socket.error as e:
             self._socket.close()
-            raise ManagerSocketError("Connection to Asterisk manager could not be established: %(error)s" % {
-             'error': _format_socket_error(e),
-            })
+            raise ManagerSocketError(f"Connection to Asterisk manager could not be established: {_format_socket_error(e)}")
         self._connected = True
 
         #Pop the greeting off the head of the pipe and set the version information
@@ -1194,9 +1145,7 @@ class _SynchronisedSocket(object):
             line = self._socket_file.readline()
         except socket.error as e:
             self._socket.close()
-            raise ManagerSocketError("Connection to Asterisk manager broken while reading greeting: %(error)s" % {
-             'error': _format_socket_error(e),
-            })
+            raise ManagerSocketError(f"Connection to Asterisk manager broken while reading greeting: {_format_socket_error(e)}")
         else:
             if '/' in line:
                 (self._asterisk_name, self._asterisk_version) = (token.strip() for token in line.split('/', 1))

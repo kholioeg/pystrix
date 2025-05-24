@@ -54,9 +54,7 @@ def quote(value):
     Encapsulates `value` in double-quotes and coerces it into a string, if
     necessary.
     """
-    return '"%(value)s"' % {
-     'value': str(value),
-    }
+    return f'"{str(value)}"'
 
 
 #Classes
@@ -147,9 +145,7 @@ class _AGI(object):
                 response[key] = _ValueData(value or '', data)
                 
             if not _RESULT_KEY in response: #Must always be present.
-                raise AGINoResultError("Asterisk did not provide a '%(result-key)s' key-value pair" % {
-                 'result-key': _RESULT_KEY,
-                }, response)
+                raise AGINoResultError(f"Asterisk did not provide a '{_RESULT_KEY}' key-value pair", response)
 
             result = response.get(_RESULT_KEY)
             if result.value == '-1': #A result of -1 always indicates failure
@@ -173,10 +169,7 @@ class _AGI(object):
                     break
             raise AGIUsageError('\n'.join(usage + ['']))
         else:
-            raise AGIUnknownError("Unhandled code or undefined response: %(code)i : %(line)s" % {
-             'code': code,
-             'line': repr(line),
-            })
+            raise AGIUnknownError(f"Unhandled code or undefined response: {code} : {repr(line)}")
             
     def _parse_agi_environment(self):
         """
@@ -211,9 +204,7 @@ class _AGI(object):
                 line += self._read_line()
             return line.decode().strip()
         except IOError as e:
-            raise AGISIGPIPEHangup("Process input pipe broken: %(error)s" % {
-             'error': str(e),
-            })
+            raise AGISIGPIPEHangup(f"Process input pipe broken: {str(e)}")
             
     def _send_command(self, command, *args):
         """
@@ -228,9 +219,7 @@ class _AGI(object):
             self._wfile.write(command.encode())
             self._wfile.flush()
         except Exception as e:
-            raise AGISIGPIPEHangup("Socket link broken: %(error)s" % {
-             'error': str(e),
-            })
+            raise AGISIGPIPEHangup(f"Socket link broken: {str(e)}")
             
     def _test_hangup(self):
         """
@@ -277,7 +266,7 @@ class AGIException(Exception):
     items = None #Any items received from Asterisk, as a dictionary.
 
     def __init__(self, message, items={}):
-        Exception.__init__(self, message)
+        super().__init__(message)
         self.items = items
         
 class AGIError(AGIException):

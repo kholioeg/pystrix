@@ -54,7 +54,7 @@ class AGIExec(_Event):
         Translates the 'ResultCode' header's value into an int, setting it to `-1` if coercion
         fails.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         
         generic_transforms.to_bool(headers, ('Result',), truth_value='Success')
         generic_transforms.to_int(headers, ('ResultCode',), -1)
@@ -122,7 +122,7 @@ class CoreShowChannel(_Event):
         Replaces the 'Duration' header's value with the number of seconds, as an int, or -1 if
         conversion fails.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         
         try:
             (h, m, s) = (int(v) for v in headers['Duration'].split(':'))
@@ -144,7 +144,7 @@ class CoreShowChannelsComplete(_Event):
         """
         Translates the 'ListItems' header's value into an int, or -1 on failure.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         
         generic_transforms.to_int(headers, ('ListItems',), -1)
         
@@ -173,7 +173,7 @@ class DTMF(_Event):
         """
         Translates 'Begin' and 'End' into booleans, and adds a 'Received':bool header.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         
         headers['Received'] = headers.get('Direction') == 'Received'
         generic_transforms.to_bool(headers, ('Begin', 'End',), truth_value='Yes')
@@ -204,7 +204,7 @@ class Hangup(_Event):
         """
         Translates the 'Cause' header's value into an int, setting it to `None` if coercion fails.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         generic_transforms.to_int(headers, ('Cause',), None)
         return (headers, data)
 
@@ -265,7 +265,7 @@ class Newchannel(_Event):
         Translates the 'ChannelState' header's value into an int, setting it to `None` if coercion
         fails.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         generic_transforms.to_int(headers, ('ChannelState',), None)
         return (headers, data)
 
@@ -305,7 +305,7 @@ class Newstate(_Event):
         Translates the 'ChannelState' header's value into an int, setting it to `None` if coercion
         fails.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         generic_transforms.to_int(headers, ('ChannelState',), None)
         return (headers, data)
         
@@ -325,7 +325,7 @@ class OriginateResponse(_Event):
         Sets the 'Reason' values to an int, one of the `ORIGINATE_RESULT` constants, with -1
         indicating failure.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         generic_transforms.to_int(headers, ('Reason',), -1)
         return (headers, data)
         
@@ -346,7 +346,7 @@ class ParkedCall(_Event):
         Translates the 'Timeout' header's value into an int, setting it to `None` if coercion
         fails, and leaving it absent if it wasn't present in the original response.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         if 'Timeout' in headers:
             generic_transforms.to_int(headers, ('Timeout',), None)
         return (headers, data)
@@ -361,7 +361,7 @@ class ParkedCallsComplete(_Event):
         """
         Translates the 'Total' header's value into an int, or -1 on failure.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         generic_transforms.to_int(headers, ('Total',), -1)
         return (headers, data)
 
@@ -399,7 +399,7 @@ class PeerEntry(_Event):
         Translates 'Status' into the number of milliseconds since the peer was last seen or -2 if
         unmonitored. -1 if parsing failed.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         
         try:
             if headers['Status'] == 'Unmonitored':
@@ -426,7 +426,7 @@ class PeerlistComplete(_Event):
         """
         Translates the 'ListItems' header's value into an int, or -1 on failure.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         generic_transforms.to_int(headers, ('ListItems',), -1)
         return (headers, data)
 
@@ -445,7 +445,7 @@ class QueueEntry(_Event):
         """
         Translates the 'Position' and 'Wait' headers' values into ints, setting them to -1 on error.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         generic_transforms.to_int(headers, ('Position', 'Wait',), -1)
         return (headers, data)
 
@@ -474,7 +474,8 @@ class QueueMember(_Event):
         
         'Paused' is set to a bool.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
+        (headers, data) = super().process()
         generic_transforms.to_bool(headers, ('Paused',), truth_value='1')
         generic_transforms.to_int(headers, ('CallsTaken', 'LastCall', 'Penalty', 'Status',), -1)
         return (headers, data)
@@ -522,7 +523,7 @@ class QueueMemberPaused(_Event):
         """
         'Paused' is set to a bool.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         generic_transforms.to_bool(headers, ('Paused',), truth_value='1')
         return (headers, data)
 
@@ -557,7 +558,7 @@ class QueueParams(_Event):
         Translates the 'ServiceLevel', 'ServiceLevelPerf', and 'Weight' values into
         floats, setting them to -1 on error.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         generic_transforms.to_int(headers, ('Abandoned', 'Calls', 'Completed', 'Holdtime', 'Max',), -1)
         generic_transforms.to_float(headers, ('ServiceLevel', 'ServiceLevelPref', 'Weight',), -1)
         return (headers, data)
@@ -589,7 +590,7 @@ class QueueSummary(_Event):
     def process(self):
         """
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         generic_transforms.to_int(headers, ('LoggedIn', 'Available', 'Callers', 'HoldTime', 'TalkTime',
                                             'LongestHoldTime'), -1)
         return (headers, data)
@@ -619,7 +620,7 @@ class RegistryEntry(_Event):
         Translates the 'DomainPort', 'Port', 'Refresh', and 'RegistrationTime' values into ints,
         setting them to -1 on error.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         generic_transforms.to_int(headers, ('DomainPort', 'Port', 'Refresh', 'RegistrationTime',), -1)
         return (headers, data)
         
@@ -633,7 +634,7 @@ class RegistrationsComplete(_Event):
         """
         Translates the 'ListItems' header's value into an int, or -1 on failure.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         generic_transforms.to_int(headers, ('ListItems',), -1)
         return (headers, data)
         
@@ -674,7 +675,7 @@ class RTCPReceived(_Event):
         Splits 'From' into a tuple of IP:str and port:int, or sets it to `None` if the format is
         unknown.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         
         _from = headers.get('From')
         if _from and ':' in _from:
@@ -717,7 +718,7 @@ class RTCPSent(_Event):
         Splits 'To' into a tuple of IP:str and port:int, or sets it to `None` if the format is
         unknown.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         
         to = headers.get('To')
         if to and ':' in to:
@@ -743,7 +744,7 @@ class Shutdown(_Event):
         """
         'Restart' is set to a bool.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         generic_transforms.to_bool(headers, ('Restart',), truth_value='True')
         return (headers, data)
         
@@ -781,7 +782,7 @@ class Status(_Event):
         """
         Translates the 'Seconds' header's value into an int, setting it to -1 on error.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         generic_transforms.to_int(headers, ('Seconds',), -1)
         return (headers, data)
         
@@ -795,7 +796,7 @@ class StatusComplete(_Event):
         """
         Translates the 'Items' header's value into an int, or -1 on failure.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         generic_transforms.to_int(headers, ('Items',), -1)
         return (headers, data)
 
@@ -861,7 +862,7 @@ class VoicemailUserEntry(_Event):
         Translates the 'AttachMessage', 'CallOperator', 'CanReview', 'DeleteMessage', 'SayCID', and
         'SayEnvelope' values into booleans.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         
         generic_transforms.to_bool(headers, ('AttachMessage', 'CallOperator', 'CanReview', 'DeleteMessage', 'SayCID', 'SayEnvelope',), truth_value='Yes')
         header_list = ['MaxMessageCount', 'MaxMessageLength', 'NewMessageCount', 'SayDurationMinimum']
@@ -900,7 +901,7 @@ class CoreShowChannels_Aggregate(_Aggregate):
     
     def _finalise(self, event):
         self._check_list_items_count(event, 'ListItems')
-        return _Aggregate._finalise(self, event)
+        return super()._finalise(event)
         
 class ParkedCalls_Aggregate(_Aggregate):
     """
@@ -917,7 +918,7 @@ class ParkedCalls_Aggregate(_Aggregate):
     
     def _finalise(self, event):
         self._check_list_items_count(event, 'Total')
-        return _Aggregate._finalise(self, event)
+        return super()._finalise(event)
         
 class QueueStatus_Aggregate(_Aggregate):
     """
@@ -962,7 +963,7 @@ class SIPpeers_Aggregate(_Aggregate):
     
     def _finalise(self, event):
         self._check_list_items_count(event, 'ListItems')
-        return _Aggregate._finalise(self, event)
+        return super()._finalise(event)
         
 class SIPshowregistry_Aggregate(_Aggregate):
     """
@@ -979,7 +980,7 @@ class SIPshowregistry_Aggregate(_Aggregate):
     
     def _finalise(self, event):
         self._check_list_items_count(event, 'ListItems')
-        return _Aggregate._finalise(self, event)
+        return super()._finalise(event)
         
 class Status_Aggregate(_Aggregate):
     """
@@ -996,7 +997,7 @@ class Status_Aggregate(_Aggregate):
     
     def _finalise(self, event):
         self._check_list_items_count(event, 'Items')
-        return _Aggregate._finalise(self, event)
+        return super()._finalise(event)
         
 class VoicemailUsersList_Aggregate(_Aggregate):
     """

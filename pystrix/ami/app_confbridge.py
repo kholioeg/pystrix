@@ -47,7 +47,7 @@ class ConfbridgeKick(_Request):
         """
         `channel` is the channel to be kicked from `conference`.
         """
-        _Request.__init__(self, 'ConfbridgeKick')
+        super().__init__('ConfbridgeKick')
         self['Conference'] = conference
         self['Channel'] = channel
         
@@ -65,7 +65,7 @@ class ConfbridgeList(_Request):
         """
         `conference` is the identifier of the bridge.
         """
-        _Request.__init__(self, 'ConfbridgeList')
+        super().__init__('ConfbridgeList')
         self['Conference'] = conference
 
 class ConfbridgeListRooms(_Request):
@@ -80,7 +80,7 @@ class ConfbridgeListRooms(_Request):
     _synchronous_events_finalising = (app_confbridge_events.ConfbridgeListRoomsComplete,)
     
     def __init__(self):
-        _Request.__init__(self, 'ConfbridgeListRooms')
+        super().__init__('ConfbridgeListRooms')
 
 class ConfbridgeLock(_Request):
     """
@@ -90,7 +90,7 @@ class ConfbridgeLock(_Request):
         """
         `conference` is the identifier of the bridge.
         """
-        _Request.__init__(self, 'ConfbridgeLock')
+        super().__init__('ConfbridgeLock')
         self['Conference'] = conference
 
 class ConfbridgeUnlock(_Request):
@@ -101,7 +101,7 @@ class ConfbridgeUnlock(_Request):
         """
         `conference` is the identifier of the bridge.
         """
-        _Request.__init__(self, 'ConfbridgeUnlock')
+        super().__init__('ConfbridgeUnlock')
         self['Conference'] = conference
 
 class ConfbridgeMoHOn(_Request):
@@ -116,7 +116,7 @@ class ConfbridgeMoHOn(_Request):
         """
         `channel` is the channel to which MoH should be started in `conference`.
         """
-        _Request.__init__(self, 'ConfbridgeMoHOn')
+        super().__init__('ConfbridgeMoHOn')
         self['Conference'] = conference
         self['Channel'] = channel
 
@@ -132,7 +132,7 @@ class ConfbridgeMoHOff(_Request):
         """
         `channel` is the channel to which MoH should be stopped in `conference`.
         """
-        _Request.__init__(self, 'ConfbridgeMoHOff')
+        super().__init__('ConfbridgeMoHOff')
         self['Conference'] = conference
         self['Channel'] = channel
 
@@ -144,7 +144,7 @@ class ConfbridgeMute(_Request):
         """
         `channel` is the channel to be muted in `conference`.
         """
-        _Request.__init__(self, 'ConfbridgeMute')
+        super().__init__('ConfbridgeMute')
         self['Conference'] = conference
         self['Channel'] = channel
 
@@ -156,7 +156,7 @@ class ConfbridgeUnmute(_Request):
         """
         `channel` is the channel to be unmuted in `conference`.
         """
-        _Request.__init__(self, 'ConfbridgeUnmute')
+        super().__init__('ConfbridgeUnmute')
         self['Conference'] = conference
         self['Channel'] = channel
 
@@ -172,7 +172,7 @@ class ConfbridgePlayFile(_Request):
         `file`, resolved like other Asterisk media, is played to `conference`
         or, if specified, a specific `channel` therein.
         """
-        _Request.__init__(self, 'ConfbridgePlayFile')
+        super().__init__('ConfbridgePlayFile')
         self['Conference'] = conference
         if channel:
             self['Channel'] = channel
@@ -194,7 +194,7 @@ class ConfbridgeStartRecord(_Request):
         `conference` is the room to be recorded, and `filename`, optional, is the path,
         Asterisk-resolved or absolute, of the file to write.
         """
-        _Request.__init__(self, 'ConfbridgeStartRecord')
+        super().__init__('ConfbridgeStartRecord')
         self['Conference'] = conference
         if filename:
             self['RecordFile'] = filename
@@ -213,7 +213,7 @@ class ConfbridgeStopRecord(_Request):
         """
         `conference` is the room being recorded.
         """
-        _Request.__init__(self, 'ConfbridgeStopRecord')
+        super().__init__('ConfbridgeStopRecord')
         self['Conference'] = conference
 
 class ConfbridgeSetSingleVideoSrc(_Request):
@@ -224,7 +224,7 @@ class ConfbridgeSetSingleVideoSrc(_Request):
         """
         `channel` is the video source in `conference`.
         """
-        _Request.__init__(self, 'ConfbridgeSetSingleVideoSource')
+        super().__init__('ConfbridgeSetSingleVideoSource')
         self['Conference'] = conference
         self['Channel'] = channel
 

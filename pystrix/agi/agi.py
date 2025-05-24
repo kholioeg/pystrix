@@ -52,7 +52,7 @@ class AGI(_AGI):
         self._rfile = sys.stdin
         self._wfile = sys.stdout
         
-        _AGI.__init__(self, debug)
+        super().__init__(debug)
         
     def _handle_sighup(self, signum, frame):
         """
@@ -72,7 +72,7 @@ class AGI(_AGI):
         if self._got_sighup:
             raise AGISIGHUPHangup("Received SIGHUP from Asterisk")
             
-        _AGI._test_hangup(self)
+        super()._test_hangup()
         
 class AGISIGHUPHangup(AGIHangup):
     """

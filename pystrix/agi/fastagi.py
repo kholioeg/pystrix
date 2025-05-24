@@ -35,20 +35,15 @@ Authors:
 
 - Neil Tallim <n.tallim@ivrnet.com>
 """
-import cgi
 import re
 import socket
 import threading
 import types
+import urllib.parse
 from pystrix.agi.agi_core import *
 from pystrix.agi.agi_core import _AGI
 
-try:
-	import socketserver
-except:
-	import SocketServer as socketserver
-
-
+import socketserver
 
 
 class _ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -85,7 +80,7 @@ class _AGIClientHandler(socketserver.StreamRequestHandler):
         """
         env = agi_instance.get_environment()
         keys = sorted((int(key[8:]) for key in env if key.startswith('agi_arg_')))
-        return tuple((env['agi_arg_%i' % key] for key in keys))
+        return tuple((env[f'agi_arg_{key}'] for key in keys))
 
     def _extract_query_elements(self, agi_instance):
         """
@@ -97,7 +92,7 @@ class _AGIClientHandler(socketserver.StreamRequestHandler):
         path = tokens[0]
         if len(tokens) == 1:
             return (path, {})
-        return (path, cgi.urlparse.parse_qs(tokens[1]))
+        return (path, urllib.parse.parse_qs(tokens[1]))
 
 class FastAGIServer(_ThreadedTCPServer):
     """
@@ -122,7 +117,7 @@ class FastAGIServer(_ThreadedTCPServer):
 
         `debug` should only be turned on for library development.
         """
-        _ThreadedTCPServer.__init__(self, (interface, port), _AGIClientHandler)
+        super().__init__((interface, port), _AGIClientHandler)
         self.debug = debug
         self.daemon_threads = daemon_threads
         self._script_handlers = []
@@ -212,5 +207,5 @@ class FastAGI(_AGI):
         self._rfile = rfile
         self._wfile = wfile
         
-        _AGI.__init__(self, debug)
+        super().__init__(debug)
         

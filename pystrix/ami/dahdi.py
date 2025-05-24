@@ -45,7 +45,7 @@ class DAHDIDNDoff(_Request):
         """
         `dahdi_channel` is the channel to modify.
         """
-        _Request.__init__(self, 'DAHDIDNDoff')
+        super().__init__('DAHDIDNDoff')
         self['DAHDIChannel'] = dahdi_channel
 
 class DAHDIDNDon(_Request):
@@ -56,7 +56,7 @@ class DAHDIDNDon(_Request):
         """
         `dahdi_channel` is the channel to modify.
         """
-        _Request.__init__(self, 'DAHDIDNDon')
+        super().__init__('DAHDIDNDon')
         self['DAHDIChannel'] = dahdi_channel
         
 class DAHDIDialOffhook(_Request):
@@ -67,7 +67,7 @@ class DAHDIDialOffhook(_Request):
         """
         `dahdi_channel` is the channel to use and `number` is the number to dial.
         """
-        _Request.__init__(self, 'DAHDIDialOffhook')
+        super().__init__('DAHDIDialOffhook')
         self['DAHDIChannel'] = dahdi_channel
         self['Number'] = number
 
@@ -79,7 +79,7 @@ class DAHDIHangup(_Request):
         """
         `dahdi_channel` is the channel to hang up.
         """
-        _Request.__init__(self, 'DAHDIHangup')
+        super().__init__('DAHDIHangup')
         self['DAHDIChannel'] = dahdi_channel
 
 class DAHDIRestart(_Request):
@@ -87,7 +87,7 @@ class DAHDIRestart(_Request):
     Fully restarts all DAHDI channels.
     """
     def __init__(self):
-        _Request.__init__(self, 'DAHDIRestart')
+        super().__init__('DAHDIRestart')
 
 class DAHDIShowChannels(_Request):
     """
@@ -99,7 +99,7 @@ class DAHDIShowChannels(_Request):
     _synchronous_events_finalising = (dahdi_events.DAHDIShowChannelsComplete,)
     
     def __init__(self, dahdi_channel=None):
-        _Request.__init__(self, 'DAHDIShowChannels')
+        super().__init__('DAHDIShowChannels')
         if not dahdi_channel is None:
             self['DAHDIChannel'] = dahdi_channel
             

@@ -69,7 +69,7 @@ class MeetmeList(_Event):
         
         Translates the 'UserNumber' header's value into an int, or -1 on failure.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         
         talking = headers.get('Talking')
         if talking == 'Yes':
@@ -94,7 +94,7 @@ class MeetmeListComplete(_Event):
         """
         Translates the 'ListItems' header's value into an int, or -1 on failure.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         
         generic_transforms.to_int(headers, ('ListItems',), -1)
         
@@ -119,7 +119,7 @@ class MeetmeListRooms(_Event):
         
         Translates the 'Locked' header's value into a bool.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         
         generic_transforms.to_bool(headers, ('Locked',), truth_value='Yes')
         generic_transforms.to_int(headers, ('Parties',), -1)
@@ -136,7 +136,7 @@ class MeetmeListRoomsComplete(_Event):
         """
         Translates the 'ListItems' header's value into an int, or -1 on failure.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         
         generic_transforms.to_int(headers, ('ListItems',), -1)
         
@@ -156,7 +156,7 @@ class MeetmeMute(_Event):
         """
         Translates the 'Status' header's value into a bool.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         
         generic_transforms.to_bool(headers, ('Status',), truth_value='on')
         
@@ -183,7 +183,7 @@ class MeetmeList_Aggregate(_Aggregate):
     
     def _finalise(self, event):
         self._check_list_items_count(event, 'ListItems')
-        return _Aggregate._finalise(self, event)
+        return super()._finalise(event)
         
 class MeetmeListRooms_Aggregate(_Aggregate):
     """

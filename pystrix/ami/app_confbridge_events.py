@@ -83,7 +83,7 @@ class ConfbridgeList(_Event):
         """
         Translates the 'Admin' and 'MarkedUser' headers' values into bools.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         
         generic_transforms.to_bool(headers, ('Admin', 'MarkedUser',), truth_value='Yes')
             
@@ -99,7 +99,7 @@ class ConfbridgeListComplete(_Event):
         """
         Translates the 'ListItems' header's value into an int, or -1 on failure.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         
         generic_transforms.to_int(headers, ('ListItems',), -1)
         
@@ -122,7 +122,7 @@ class ConfbridgeListRooms(_Event):
         
         Translates the 'Locked' header's value into a bool.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         
         generic_transforms.to_bool(headers, ('Locked',), truth_value='Yes')
         generic_transforms.to_int(headers, ('Marked', 'Parties',), -1)
@@ -139,7 +139,7 @@ class ConfbridgeListRoomsComplete(_Event):
         """
         Translates the 'ListItems' header's value into an int, or -1 on failure.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         
         generic_transforms.to_int(headers, ('ListItems',), -1)
         
@@ -165,7 +165,7 @@ class ConfbridgeTalking(_Event):
         """
         Translates the 'TalkingStatus' header's value into a bool.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         
         generic_transforms.to_bool(headers, ('TalkingStatus',), truth_value='on')
         
@@ -193,7 +193,7 @@ class ConfbridgeList_Aggregate(_Aggregate):
     
     def _finalise(self, event):
         self._check_list_items_count(event, 'ListItems')
-        return _Aggregate._finalise(self, event)
+        return super()._finalise(event)
         
 class ConfbridgeListRooms_Aggregate(_Aggregate):
     """

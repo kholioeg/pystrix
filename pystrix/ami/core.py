@@ -39,7 +39,6 @@ http://www.asteriskdocs.org/ and https://wiki.asterisk.org/
 """
 import hashlib
 import time
-import types
 
 from pystrix.ami.ami import (_Request, ManagerError)
 from pystrix.ami import core_events
@@ -84,7 +83,7 @@ class AbsoluteTimeout(_Request):
         Causes the call on `channel` to be hung up after `seconds` have elapsed, defaulting to
         disabling auto-hangup.
         """
-        _Request.__init__(self, 'AbsoluteTimeout')
+        super().__init__('AbsoluteTimeout')
         self['Channel'] = channel
         self['Timeout'] = str(int(seconds))
 
@@ -105,7 +104,7 @@ class AGI(_Request):
         and can reasonably be set to a sequential digit or UUID in your application for tracking
         purposes.
         """
-        _Request.__init__(self, 'AGI')
+        super().__init__('AGI')
         self['Channel'] = channel
         self['Command'] = command
         if not command_id is None:
@@ -122,7 +121,7 @@ class Bridge(_Request):
         `channel_1` is the channel to which `channel_2` will be connected. `tone`, if `True`, will
         cause a sound to be played on `channel_2`.
         """
-        _Request.__init__(self, "Bridge")
+        super().__init__("Bridge")
         self['Channel1'] = channel_1
         self['Channel2'] = channel_2
         self['Tone'] = tone and 'yes' or 'no'
@@ -140,7 +139,7 @@ class Challenge(_Request):
         """
         `authtype` is used to specify the authentication type to be used.
         """
-        _Request.__init__(self, 'Challenge')
+        super().__init__('Challenge')
         self['AuthType'] = authtype
         
 class ChangeMonitor(_Request):
@@ -155,7 +154,7 @@ class ChangeMonitor(_Request):
         `channel` is the channel to be affected and `filename` is the new target filename, without
         extension, as either an auto-resolved or absolute path.
         """
-        _Request.__init__(self, 'ChangeMonitor')
+        super().__init__('ChangeMonitor')
         self['Channel'] = channel
         self['File'] = filename
         
@@ -170,7 +169,7 @@ class Command(_Request):
         """
         `command` is the command to be executed.
         """
-        _Request.__init__(self, 'Command')
+        super().__init__('Command')
         self['Command'] = command
 
 class CoreShowChannels(_Request):
@@ -187,7 +186,7 @@ class CoreShowChannels(_Request):
     _synchronous_events_finalising = (core_events.CoreShowChannelsComplete,)
     
     def __init__(self):
-        _Request.__init__(self, "CoreShowChannels")
+        super().__init__("CoreShowChannels")
         
 class CreateConfig(_Request):
     """
@@ -199,7 +198,7 @@ class CreateConfig(_Request):
         """
         `filename` is the name of the file, with extension, to be created.
         """
-        _Request.__init__(self, "CreateConfig")
+        super().__init__("CreateConfig")
         self['Filename'] = filename
 
 class DBDel(_Request):
@@ -212,7 +211,7 @@ class DBDel(_Request):
         """
         `family` and `key` are specifiers to select the value to remove.
         """
-        _Request.__init__(self, 'DBDel')
+        super().__init__('DBDel')
         self['Family'] = family
         self['Key'] = key
 
@@ -226,7 +225,7 @@ class DBDelTree(_Request):
         """
         `family` and `key` (optional) are specifiers to select the values to remove.
         """
-        _Request.__init__(self, 'DBDelTree')
+        super().__init__('DBDelTree')
         self['Family'] = family
         if not key is None:
             self['Key'] = key
@@ -243,7 +242,7 @@ class DBGet(_Request):
         """
         `family` and `key` are specifiers to select the value to retrieve.
         """
-        _Request.__init__(self, 'DBGet')
+        super().__init__('DBGet')
         self['Family'] = family
         self['Key'] = key
         
@@ -257,7 +256,7 @@ class DBPut(_Request):
         """
         `family` and `key` are specifiers for where to place `value`.
         """
-        _Request.__init__(self, 'DBPut')
+        super().__init__('DBPut')
         self['Family'] = family
         self['Key'] = key
         self['Val'] = value
@@ -281,7 +280,7 @@ class Events(_Request):
         
         If an empty value is provided, EVENTMASK_NONE is assumed.
         """
-        _Request.__init__(self, 'Events')
+        super().__init__('Events')
         if isinstance(mask, str):
             self['EventMask'] = mask
         else:
@@ -294,7 +293,7 @@ class Events(_Request):
         """
         Indicates success if the response matches one of the valid patterns.
         """
-        response = _Request.process_response(self, response)
+        response = super().process_response(response)
         response.success = response.get('Response') in ('Events On', 'Events Off')
         return response
         
@@ -320,7 +319,7 @@ class ExtensionState(_Request):
         `extension` is the extension to be checked and `context` is the container in which it
         resides.
         """
-        _Request.__init__(self, 'ExtensionState')
+        super().__init__('ExtensionState')
         self['Exten'] = extension
         self['Context'] = context
         
@@ -339,14 +338,14 @@ class GetConfig(_Request):
         """
         `filename` is the name of the config file to be read, including extension.
         """
-        _Request.__init__(self, 'GetConfig')
+        super().__init__('GetConfig')
         self['Filename'] = filename
         
     def process_response(self, response):
         """
         Adds a 'get_lines' function that returns a generator that yields every line in order.
         """
-        response = _Request.process_response(self, response)
+        response = super().process_response(response)
         response.get_lines = lambda : (value for (key, value) in sorted(response.items()) if key.startswith('Line-'))
         return response
         
@@ -362,7 +361,7 @@ class Getvar(_Request):
         `variable` is the name of the variable to retrieve. `channel` is optional; if not specified,
         a global variable is retrieved.
         """
-        _Request.__init__(self, 'Getvar')
+        super().__init__('Getvar')
         self['Variable'] = variable
         if not channel is None:
             self['Channel'] = channel
@@ -381,7 +380,7 @@ class Hangup(_Request):
         """
         `channel` is the ID of the channel to be hung up.
         """
-        _Request.__init__(self, 'Hangup')
+        super().__init__('Hangup')
         self['Channel'] = channel
         
 class ListCommands(_Request):
@@ -390,7 +389,7 @@ class ListCommands(_Request):
     as a series of lines in the response's 'data' attribute.
     """
     def __init__(self):
-        _Request.__init__(self, 'ListCommands')
+        super().__init__('ListCommands')
 
 class ListCategories(_Request):
     """
@@ -403,7 +402,7 @@ class ListCategories(_Request):
         """
         `filename` is the name of the file, with extension, to be read.
         """
-        _Request.__init__(self, 'ListCategories')
+        super().__init__('ListCategories')
         self['Filename'] = filename
         
 
@@ -418,7 +417,7 @@ class LocalOptimizeAway(_Request):
         """
         `channel` is the channel to be optimised.
         """
-        _Request.__init__(self, 'LocalOptimizeAway')
+        super().__init__('LocalOptimizeAway')
         self['Channel'] = channel
         
 class Login(_Request):
@@ -436,7 +435,7 @@ class Login(_Request):
         action, used with `authtype` to determine how to authenticate. `authtype` is ignored if the
         `challenge` parameter is unset.
         """
-        _Request.__init__(self, 'Login')
+        super().__init__('Login')
         self['Username'] = username
         
         if not challenge is None and authtype:
@@ -459,14 +458,14 @@ class Login(_Request):
         """
         if response.get('Response') == 'Error':
             raise ManagerAuthError(response.get('Message'))
-        return _Request.process_response(self, response)
+        return super().process_response(response)
         
 class Logoff(_Request):
     """
     Logs out of the current manager session, permitting reauthentication.
     """
     def __init__(self):
-        _Request.__init__(self, 'Logoff')
+        super().__init__('Logoff')
         
 class MailboxCount(_Request):
     """
@@ -477,14 +476,14 @@ class MailboxCount(_Request):
         """
         `mailbox` is the mailbox to check.
         """
-        _Request.__init__(self, 'MailboxCount')
+        super().__init__('MailboxCount')
         self['Mailbox'] = mailbox
         
     def process_response(self, response):
         """
         Converts the message-counts into integers.
         """
-        response = _Request.process_response(self, response)
+        response = super().process_response(response)
         generic_transforms.to_int(response, ('NewMessages', 'OldMessages',), -1)
         return response
         
@@ -497,14 +496,14 @@ class MailboxStatus(_Request):
         """
         `mailbox` is the mailbox to check.
         """
-        _Request.__init__(self, 'MailboxStatus')
+        super().__init__('MailboxStatus')
         self['Mailbox'] = mailbox
 
     def process_response(self, response):
         """
         Converts the waiting-message-count into an integer.
         """
-        response = _Request.process_response(self, response)
+        response = super().process_response(response)
         generic_transforms.to_int(response, ('Waiting',), -1)
         return response
 
@@ -526,7 +525,7 @@ class MixMonitorMute(_Request):
 
         `mute` is `True` to muste the audio.
         """
-        _Request.__init__(self, 'MixMonitorMute')
+        super().__init__('MixMonitorMute')
         self['Channel'] = channel
         self['Direction'] = direction
         self['State'] = mute and '1' or '0'
@@ -541,7 +540,7 @@ class ModuleCheck(_Request):
         """
         `module` is the name of the module, without extension.
         """
-        _Request.__init__(self, 'ModuleCheck')
+        super().__init__('ModuleCheck')
         self['Module'] = module
 
 class ModuleLoad(_Request):
@@ -569,7 +568,7 @@ class ModuleLoad(_Request):
         * 'manager'
         * 'rtp'
         """
-        _Request.__init__(self, 'ModuleLoad')
+        super().__init__('ModuleLoad')
         self['LoadType'] = load_type
         if not module is None:
             self['Module'] = module
@@ -599,7 +598,7 @@ class Monitor(_Request):
         `mix`, defaulting to `True`, muxes both audio streams associated with the channel after
         recording is complete, with the alternative leaving the two streams separate.
         """
-        _Request.__init__(self, 'Monitor')
+        super().__init__('Monitor')
         self['Channel'] = channel
         self['File'] = filename
         self['Format'] = format
@@ -619,7 +618,7 @@ class MuteAudio(_Request):
         on or off. `input` (from the channel) and `output` (to the channel) indicate the subchannels
         to be adjusted.
         """
-        _Request.__init__(self, 'MuteAudio')
+        super().__init__('MuteAudio')
         self['Channel'] = channel
         if input and output:
             self['Direction'] = 'all'
@@ -637,7 +636,7 @@ class _Originate(_Request):
     
     Requires call
     """
-    def __init__(self, channel, timeout=None, callerid=None, variables={}, account=None, async=True):
+    def __init__(self, channel, timeout=None, callerid=None, variables={}, account=None, asynchronous=True):
         """
         Sets common parameters for originated calls.
 
@@ -659,11 +658,11 @@ class _Originate(_Request):
         `account` is an optional account code to be associated with the channel, useful for tracking
         billing information.
 
-        `async` should always be `True`. If not, only one unanswered call can be active at a time.
+        `asynchronous` should always be `True`. If not, only one unanswered call can be active at a time.
         """
-        _Request.__init__(self, "Originate")
+        super().__init__("Originate")
         self['Channel'] = channel
-        self['Async'] = async and 'true' or 'false'
+        self['Async'] = asynchronous and 'true' or 'false'
         
         if timeout and timeout > 0:
             self['Timeout'] = str(timeout)
@@ -686,7 +685,7 @@ class Originate_Application(_Originate):
     
     Requires call
     """
-    def __init__(self, channel, application, data=(), timeout=None, callerid=None, variables={}, account=None, async=True):
+    def __init__(self, channel, application, data=(), timeout=None, callerid=None, variables={}, account=None, asynchronous=True):
         """
         `channel` is the destination to be called, expressed as a fully qualified Asterisk channel,
         like "SIP/test-account@example.org".
@@ -710,9 +709,9 @@ class Originate_Application(_Originate):
         `account` is an optional account code to be associated with the channel, useful for tracking
         billing information.
 
-        `async` should always be `True`. If not, only one unanswered call can be active at a time.
+        `asynchronous` should always be `True`. If not, only one unanswered call can be active at a time.
         """
-        _Originate.__init__(self, channel, timeout, callerid, variables, account, async)
+        super().__init__(channel, timeout, callerid, variables, account, asynchronous)
         self['Application'] = application
         if data:
             self['Data'] = ','.join((str(d) for d in data))
@@ -723,7 +722,7 @@ class Originate_Context(_Originate):
     
     Requires call
     """
-    def __init__(self, channel, context, extension, priority, timeout=None, callerid=None, variables={}, account=None, async=True):
+    def __init__(self, channel, context, extension, priority, timeout=None, callerid=None, variables={}, account=None, asynchronous=True):
         """
         `channel` is the destination to be called, expressed as a fully qualified Asterisk channel,
         like "SIP/test-account@example.org".
@@ -747,9 +746,9 @@ class Originate_Context(_Originate):
         `account` is an optional account code to be associated with the channel, useful for tracking
         billing information.
 
-        `async` should always be `True`. If not, only one unanswered call can be active at a time.
+        `asynchronous` should always be `True`. If not, only one unanswered call can be active at a time.
         """
-        _Originate.__init__(self, channel, timeout, callerid, variables, account, async)
+        super().__init__(channel, timeout, callerid, variables, account, asynchronous)
         self['Context'] = context
         self['Exten'] = extension
         self['Priority'] = priority
@@ -768,7 +767,7 @@ class Park(_Request):
         If `timeout`, a number of milliseconds, is given, then `channel_callback` is given `channel`
         if the call was not previously retrieved.
         """
-        _Request.__init__(self, "Park")
+        super().__init__("Park")
         self['Channel'] = channel
         self['Channel2'] = channel_callback
         if timeout:
@@ -786,7 +785,7 @@ class ParkedCalls(_Request):
     _synchronous_events_finalising = (core_events.ParkedCallsComplete,)
     
     def __init__(self):
-        _Request.__init__(self, "ParkedCalls")
+        super().__init__("ParkedCalls")
 
 class PauseMonitor(_Request):
     """
@@ -799,7 +798,7 @@ class PauseMonitor(_Request):
         """
         `channel` is the channel to be affected.
         """
-        _Request.__init__(self, 'PauseMonitor')
+        super().__init__('PauseMonitor')
         self['Channel'] = channel
         
 class Ping(_Request):
@@ -810,13 +809,13 @@ class Ping(_Request):
     _start_time = None #The time at which the ping message was built
     
     def __init__(self):
-        _Request.__init__(self, 'Ping')
+        super().__init__('Ping')
         
     def build_request(self, action_id, id_generator, **kwargs):
         """
         Records the time at which the request was assembled, to provide a latency value.
         """
-        request = _Request.build_request(self, action_id, id_generator, **kwargs)
+        request = super().build_request(action_id, id_generator, **kwargs)
         self._start_time = time.time()
         return request
         
@@ -825,7 +824,7 @@ class Ping(_Request):
         Adds the number of seconds elapsed since the message was prepared for transmission under
         the 'RTT' key or sets it to -1 in case the server didn't respond as expected.
         """
-        response = _Request.process_response(self, response)
+        response = super().process_response(response)
         if response.get('Response') == 'Pong':
             response['RTT'] = time.time() - self._start_time
         else:
@@ -842,7 +841,7 @@ class PlayDTMF(_Request):
         """
         `channel` is the channel to be affected, and `digit` is the tone to play.
         """
-        _Request.__init__(self, 'PlayDTMF')
+        super().__init__('PlayDTMF')
         self['Channel'] = channel
         self['Digit'] = str(digit)
 
@@ -864,7 +863,7 @@ class QueueAdd(_Request):
         a priority structure (lower priorities first, defaulintg to 0) for call escalation, and
         `paused` optinally allows the interface to start in a disabled state.
         """
-        _Request.__init__(self, "QueueAdd")
+        super().__init__("QueueAdd")
         self['Queue'] = queue
         self['Interface'] = interface
         self['Penalty'] = str(penalty)
@@ -888,7 +887,7 @@ class QueueLog(_Request):
 
         `message`'s purpose is presently unknown.
         """
-        _Request.__init__(self, "QueueLog")
+        super().__init__("QueueLog")
         self['Queue'] = queue
         self['Event'] = event
         if not uniqueid is None:
@@ -911,7 +910,7 @@ class QueuePause(_Request):
         `interface` is the device to be affected, and `queue` optionally limits the scope to a
         single queue. `paused` must be `True` or `False`, to control the action being taken.
         """
-        _Request.__init__(self, "QueuePause")
+        super().__init__("QueuePause")
         self['Interface'] = interface
         self['Paused'] = paused and 'true' or 'false'
         if not queue is None:
@@ -928,7 +927,7 @@ class QueuePenalty(_Request):
         Changes the `penalty` value associated with `interface` in all queues, unless `queue` is
         defined, limiting it to one.
         """
-        _Request.__init__(self, "QueuePenalty")
+        super().__init__("QueuePenalty")
         self['Interface'] = interface
         self['Penalty'] = str(penalty)
         if not queue is None:
@@ -951,7 +950,7 @@ class QueueReload(_Request):
         `parameters` is 'yes' (default) or 'no', indicating whether the parameter-list should be
         reloaded.
         """
-        _Request.__init__(self, "QueueReload")
+        super().__init__("QueueReload")
         self['Members'] = members
         self['Rules'] = rules
         self['Parameters'] = parameters
@@ -972,7 +971,7 @@ class QueueRemove(_Request):
         """
         Removes the device identified by `interface` from the given `queue`.
         """
-        _Request.__init__(self, "QueueRemove")
+        super().__init__("QueueRemove")
         self['Queue'] = queue
         self['Interface'] = interface
 
@@ -991,7 +990,7 @@ class QueueStatus(_Request):
         """
         Describes all queues in the system, unless `queue` is given, which limits the scope to one.
         """
-        _Request.__init__(self, "QueueStatus")
+        super().__init__("QueueStatus")
         if not queue is None:
             self['Queue'] = queue
 
@@ -1011,7 +1010,7 @@ class QueueSummary(_Request):
         """
         Describes all queues in the system, unless `queue` is given, which limits the scope to one.
         """
-        _Request.__init__(self, "QueueSummary")
+        super().__init__("QueueSummary")
         if not queue is None:
             self['Queue'] = queue
           
@@ -1030,7 +1029,7 @@ class Redirect(_Request):
         validation is performed, so specifying an invalid target will terminate the call
         immediately.
         """
-        _Request.__init__(self, "Redirect")
+        super().__init__("Redirect")
         self['Channel'] = channel
         self['Context'] = context
         self['Exten'] = extension
@@ -1047,7 +1046,7 @@ class Reload(_Request):
         If given, `module` limits the scope of the reload to a specific module, named without
         extension.
         """
-        _Request.__init__(self, "Reload")
+        super().__init__("Reload")
         if not module is None:
             self['Module'] = module
 
@@ -1061,7 +1060,7 @@ class SendText(_Request):
         """
         `channel` is the channel along which to send `message`.
         """
-        _Request.__init__(self, "SendText")
+        super().__init__("SendText")
         self['Channel'] = channel
         self['Message'] = message
         
@@ -1075,7 +1074,7 @@ class SetCDRUserField(_Request):
         """
         `channel` is the channel to be affected, and `user_field` is the value to set.
         """
-        _Request.__init__(self, 'SetCDRUserField')
+        super().__init__('SetCDRUserField')
         self['Channel'] = channel
         self['UserField'] = user_field
         
@@ -1091,7 +1090,7 @@ class Setvar(_Request):
         
         `channel` is the channel to be affected, or `None`, the default, if the variable is global.
         """
-        _Request.__init__(self, 'Setvar')
+        super().__init__('Setvar')
         if channel:
             self['Channel'] = channel
         self['Variable'] = variable
@@ -1109,7 +1108,7 @@ class SIPnotify(_Request):
 
         `headers` is a dictionary of key-value pairs to be inserted as SIP headers.
         """
-        _Request.__init__(self, "SIPnotify")
+        super().__init__("SIPnotify")
         self['Channel'] = channel
         if headers:
             self['Variable'] = tuple(['%(key)s=%(value)s' % {'key': key, 'value': value,} for (key, value) in headers.items()])
@@ -1128,7 +1127,7 @@ class SIPpeers(_Request):
     _synchronous_events_finalising = (core_events.PeerlistComplete,)
     
     def __init__(self):
-        _Request.__init__(self, "SIPpeers")
+        super().__init__("SIPpeers")
 
 class SIPqualify(_Request):
     """
@@ -1142,7 +1141,7 @@ class SIPqualify(_Request):
         """
         `peer` is the peer to ping.
         """
-        _Request.__init__(self, "SIPqualify")
+        super().__init__("SIPqualify")
         self['Peer'] = peer
 
 class SIPshowpeer(_Request):
@@ -1203,7 +1202,7 @@ class SIPshowpeer(_Request):
         """
         `peer` is the identifier of the peer for which information is to be retrieved.
         """
-        _Request.__init__(self, "SIPshowpeer")
+        super().__init__("SIPshowpeer")
         self['Peer'] = peer
         
     def process_response(self, response):
@@ -1215,7 +1214,7 @@ class SIPshowpeer(_Request):
         Sets the 'Address-Port', 'MaxCallBR', and 'RegExpire' headers' values to ints, with -1
         indicating failure.
         """
-        response = _Request.process_response(self, response)
+        response = super().process_response(response)
         
         generic_transforms.to_bool(response, (
          'ACL', 'Dynamic', 'MD5SecretExist', 'SecretExist', 'SIP-CanReinvite', 'SIP-PromiscRedir',
@@ -1241,7 +1240,7 @@ class SIPshowregistry(_Request):
     _synchronous_events_finalising = (core_events.RegistrationsComplete,)
     
     def __init__(self):
-        _Request.__init__(self, "SIPshowregistry")
+        super().__init__("SIPshowregistry")
         
 class Status(_Request):
     """
@@ -1259,7 +1258,7 @@ class Status(_Request):
         """
         `channel` is the channel for which status information is to be retrieved.
         """
-        _Request.__init__(self, "Status")
+        super().__init__("Status")
         self['channel'] = channel
 
 class StopMonitor(_Request):
@@ -1273,7 +1272,7 @@ class StopMonitor(_Request):
         """
         `channel` is the channel to be affected.
         """
-        _Request.__init__(self, 'StopMonitor')
+        super().__init__('StopMonitor')
         self['Channel'] = channel
 
 class UnpauseMonitor(_Request):
@@ -1287,7 +1286,7 @@ class UnpauseMonitor(_Request):
         """
         `channel` is the channel to be affected.
         """
-        _Request.__init__(self, 'UnpauseMonitor')
+        super().__init__('UnpauseMonitor')
         self['Channel'] = channel
 
 class UpdateConfig(_Request):
@@ -1319,10 +1318,10 @@ class UpdateConfig(_Request):
         #. `None` or the value to be set/added (has no effect with 'Delete')
         #. `None` or a string that needs to be matched in the line to serve as a qualifier
         """
-        _Request.__init__(self, "UpdateConfig")
+        super().__init__("UpdateConfig")
         self['SrcFilename'] = src_filename
         self['DstFilename'] = dst_filename
-        self['Reload'] = type(reload) == bool and (reload and 'true' or 'false') or reload
+        self['Reload'] = isinstance(reload, bool) and (reload and 'true' or 'false') or reload
 
         for (i, (action, category, variable, value, match)) in enumerate(changes):
             index = '%(index)06i' % {
@@ -1350,7 +1349,7 @@ class UserEvent(_Request):
         Any keyword-arguments passed will be present in the generated event, making this usable as a
         crude form of message-passing between AMI clients.
         """
-        _Request.__init__(self, 'UserEvent')
+        super().__init__('UserEvent')
         for (key, value) in kwargs.items():
             self[key] = value
 
@@ -1368,7 +1367,7 @@ class VoicemailUsersList(_Request):
     _synchronous_events_finalising = (core_events.VoicemailUserEntryComplete,)
     
     def __init__(self):
-        _Request.__init__(self, 'VoicemailUsersList')
+        super().__init__('VoicemailUsersList')
 
 
 #Exceptions

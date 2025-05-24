@@ -58,7 +58,7 @@ class DAHDIShowChannels(_Event):
         Translates the 'DAHDIChannel' and 'SignallingCode' headers' values into ints, or -1 on
         failure.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         
         generic_transforms.to_bool(headers, ('DND',), truth_value='Enabled')
         generic_transforms.to_int(headers, ('DAHDIChannel', 'SignallingCode',), -1)
@@ -75,7 +75,7 @@ class DAHDIShowChannelsComplete(_Event):
         """
         Translates the 'Items' header's value into an int, or -1 on failure.
         """
-        (headers, data) = _Event.process(self)
+        (headers, data) = super().process()
         
         generic_transforms.to_int(headers, ('Items',), -1)
         
@@ -103,5 +103,5 @@ class DAHDIShowChannels_Aggregate(_Aggregate):
     
     def _finalise(self, event):
         self._check_list_items_count(event, 'Items')
-        return _Aggregate._finalise(self, event)
+        return super()._finalise(event)
         
